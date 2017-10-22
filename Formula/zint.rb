@@ -1,11 +1,17 @@
 class Zint < Formula
   desc "Barcode encoding library supporting over 50 symbologies"
-  homepage "https://zint.github.io/"
-  url "https://github.com/downloads/zint/zint/zint-2.4.3.tar.gz"
-  sha256 "de2f4fd0d008530511f5dea2cff7f96f45df4c029b57431b2411b7e1f3a523e8"
-  revision 2
+  homepage "https://sourceforge.net/projects/zint/"
+  revision 3
 
   head "https://git.code.sf.net/p/zint/code.git"
+
+  stable do
+    url "https://kent.dl.sourceforge.net/project/zint/zint/2.6.1/zint-2.6.1.tar.gz"
+    sha256 "f50aa7fbe667f76f31d2ae4170d481692f1dcdda62e42b2130cec7522330d2b2"
+    # Just wrap malloc.h and ignore it. This is already fixed in HEAD but no
+    # the latest release 2.6.1
+    patch :p1, :DATA
+  end
 
   bottle do
     cellar :any
@@ -33,3 +39,20 @@ class Zint < Formula
     system "#{bin}/zint", "-o", "test-zing.png", "-d", "This Text"
   end
 end
+
+__END__
+
+diff --git a/backend/emf.c b/backend/emf.c
+index 31199d5..bafd598 100644
+--- a/backend/emf.c
++++ b/backend/emf.c
+@@ -35,7 +35,9 @@
+ #include <stdio.h>
+ #include <string.h>
+ #include <math.h>
++#ifdef _MSC_VER
+ #include <malloc.h>
++#endif
+ #include "common.h"
+ #include "emf.h"
+
